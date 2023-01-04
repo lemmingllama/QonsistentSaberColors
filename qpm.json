@@ -3,41 +3,35 @@
   "dependenciesDir": "extern",
   "info": {
     "name": "QonsistentSaberColors",
-    "id": "QonsistentSaberColors",
-    "version": "1.1.2",
+    "id": "qonsistentsabercolors",
+    "version": "0.1.0",
     "url": null,
-    "additionalData": {
-      "overrideSoName": "lib-qonsistentsabercolors.so"
-    }
+    "additionalData": {}
   },
   "dependencies": [
     {
-      "id": "beatsaber-hook",
-      "versionRange": "^3.8.1",
-      "additionalData": {
-        "extraFiles": [
-          "src/inline-hook"
-        ]
-      }
-    },
-    {
       "id": "codegen",
-      "versionRange": "^0.22.0",
-      "additionalData": {}
-    },
-    {
-      "id": "config-utils",
-      "versionRange": "^0.7.2",
+      "versionRange": "^0.28.0",
       "additionalData": {}
     },
     {
       "id": "questui",
-      "versionRange": "^0.13.5",
+      "versionRange": "^0.17.5",
+      "additionalData": {}
+    },
+    {
+      "id": "beatsaber-hook",
+      "versionRange": "^3.14.0",
+      "additionalData": {}
+    },
+    {
+      "id": "config-utils",
+      "versionRange": "^1.0.1",
       "additionalData": {}
     },
     {
       "id": "custom-types",
-      "versionRange": "^0.15.9",
+      "versionRange": "^0.15.21",
       "additionalData": {}
     }
   ],

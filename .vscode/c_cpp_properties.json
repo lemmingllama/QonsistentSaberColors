@@ -2,23 +2,28 @@
   "configurations": [
     {
       "defines": [
-        "ID=\"QonsistantSaberColors\"",
+        "MOD_ID=\"qonsistentsabercolors\"",
         "VERSION=\"0.1.0\"",
         "__GNUC__",
         "__aarch64__"
       ],
       "includePath": [
-        "${workspaceFolder}/**",
-        "${workspaceFolder}/shared",
-        "${workspaceFolder}/include",
-        "${workspaceFolder}/extern/**",
-        "${workspaceFolder}/extern/libil2cpp/il2cpp/libil2cpp",
-        "C:/Users/Henri/Downloads/BeatSaber_QuestModding/android-ndk-r23/**"
+        "${workspaceFolder}/extern/includes/libil2cpp/il2cpp/libil2cpp", 
+        "${workspaceFolder}/extern/includes/codegen/include", 
+        "${workspaceFolder}/extern/includes", 
+        "${workspaceFolder}/include", 
+        "${workspaceFolder}/shared", 
+        "${workspaceFolder}",
+        
+        "d:/android-ndk/**",
+        "${default}"
       ],
       "name": "Quest",
       "cStandard": "c11",
       "cppStandard": "c++20",
-      "intelliSenseMode": "clang-x64"
+      "intelliSenseMode": "clang-x64",
+      "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+      "configurationProvider": "ms-vscode.cpptools"
     }
   ],
   "version": 4

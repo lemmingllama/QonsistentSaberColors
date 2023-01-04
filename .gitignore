@@ -34,6 +34,10 @@
 # VSCode config stuff
 !.vscode/c_cpp_properties.json
 !.vscode/tasks.json
+!.vscode/settings.json
+
+# Jetbrains IDEs
+.idea/
 
 # NDK stuff
 out/
@@ -44,22 +48,21 @@ out/
 ndkpath.txt
 *.zip
 *.txt
-extern/
+*.log
 Android.mk.backup
+
+# QPM stuff
+[Ee]xtern/
+*.qmod
+mod.json
 qpm.shared.json
-build/.ninja_deps
-build/.ninja_log
-build/build.ninja
-build/cmake_install.cmake
-build/CMakeFiles/cmake.check_cache
-build/CMakeFiles/CMakeOutput.log
-build/CMakeFiles/rules.ninja
-build/CMakeFiles/3.23.1/CMakeCCompiler.cmake
-build/CMakeFiles/3.23.1/CMakeCXXCompiler.cmake
-build/CMakeFiles/3.23.1/CMakeDetermineCompilerABI_C.bin
-build/CMakeFiles/3.23.1/CMakeDetermineCompilerABI_CXX.bin
-build/CMakeFiles/3.23.1/CMakeSystem.cmake
-build/CMakeFiles/3.23.1/CompilerIdC/CMakeCCompilerId.c
-build/CMakeFiles/3.23.1/CompilerIdCXX/CMakeCXXCompilerId.cpp
 qpm_defines.cmake
-QonsistentSaberColors_1.1.2.qmod
+![Cc][Mm]ake[Ll]ists.txt
+
+# CMake stuff
+[Bb]uild/
+cmake-build-*/
+extern.cmake
+
+# QMOD Schema
+mod.json.schema

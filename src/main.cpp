@@ -1,15 +1,64 @@
 #include "main.hpp"
+#include "SettingsViewController.hpp"
+#include "ModConfig.hpp"
+#include "QuestUI/shared/QuestUI.hpp"
+#include "ColorManager.hpp"
 
-#include "QonsistentSaberColors.hpp"
-#include "Config.hpp"
+#include "GlobalNamespace/MainMenuViewController.hpp"
+#include "GlobalNamespace/ColorsOverrideSettingsPanelController.hpp"
 
-#include "questui/shared/QuestUI.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "HMUI/Touchable.hpp"
+#include "UnityEngine/SceneManagement/Scene.hpp"
+#include "UnityEngine/SceneManagement/SceneManager.hpp"
 
-static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
+static ModInfo modInfo;
 
-// Returns a logger, useful for printing debug messages
+using namespace QonsistentSaberColors;
+
+MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool a, bool b, bool c)
+{
+    MainMenuViewController_DidActivate(self, a, b, c);
+    if(getModConfig().Enabled.GetValue())
+        SetColors();
+    else
+        ResetColors();
+}
+
+MAKE_HOOK_MATCH(ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged, &GlobalNamespace::ColorsOverrideSettingsPanelController::HandleOverrideColorsToggleValueChanged, void, GlobalNamespace::ColorsOverrideSettingsPanelController* self, bool isOn)
+{
+    ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged(self, isOn);
+    if(getModConfig().Enabled.GetValue())
+        SetColors();
+}
+
+MAKE_HOOK_MATCH(ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme, &GlobalNamespace::ColorsOverrideSettingsPanelController::HandleEditColorSchemeControllerDidChangeColorScheme, void, GlobalNamespace::ColorsOverrideSettingsPanelController* self, GlobalNamespace::ColorScheme* colorScheme)
+{
+    ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme(self, colorScheme);
+    if(getModConfig().Enabled.GetValue())
+        SetColors();
+}
+
+MAKE_HOOK_MATCH(ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCellWithIdx, &GlobalNamespace::ColorsOverrideSettingsPanelController::HandleDropDownDidSelectCellWithIdx, void, GlobalNamespace::ColorsOverrideSettingsPanelController* self, HMUI::DropdownWithTableView* dropDownWithTableView, int idx)
+{
+    ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCellWithIdx(self, dropDownWithTableView, idx);
+    if(getModConfig().Enabled.GetValue())
+        SetColors();
+}
+
+MAKE_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::SceneManager::SetActiveScene, bool, UnityEngine::SceneManagement::Scene scene)
+{
+    bool val = SceneManager_SetActiveScene(scene);
+    GetControllers();
+    if(getModConfig().Enabled.GetValue() && scene.get_name() == "HealthWarning")
+        SetColors();
+ 
+    return val;
+}
+
+Configuration& getConfig() {
+    static Configuration config(modInfo);
+    return config;
+}
+
 Logger& getLogger() {
     static Logger* logger = new Logger(modInfo);
     return *logger;
@@ -21,39 +70,24 @@ extern "C" void setup(ModInfo& info) {
     info.version = VERSION;
     modInfo = info;
 	
-    getModConfig().Init(modInfo);
-    
+    getConfig().Load();
     getLogger().info("Completed setup!");
-}
-
-void QuestUI_DidActivate(HMUI::ViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling){
-    getLogger().info("DidActivate: %p, %d, %d, %d", self, firstActivation, addedToHierarchy, screenSystemEnabling);
-
-    if(firstActivation) {
-        getLogger().info("QuestUI First Activation !");
-        self->get_gameObject()->AddComponent<HMUI::Touchable*>();
-
-        UnityEngine::GameObject* container = QuestUI::BeatSaberUI::CreateScrollableSettingsContainer(self->get_transform());
-        UnityEngine::Transform*  parent = container->get_transform();
-
-        auto toggle = QuestUI::BeatSaberUI::CreateToggle( parent, "Colored Laser Pointer",  getModConfig().laserPointerColors.GetValue(), [](bool value) -> void { 
-            getModConfig().laserPointerColors.SetValue(value, true);
-            modManager.UpdateColors();
-        });
-
-        QuestUI::BeatSaberUI::AddHoverHint(toggle->get_gameObject(), "Laser go pew-pew-pew.");
-
-    }
 }
 
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
-    
+
+    getModConfig().Init(modInfo);
+
     QuestUI::Init();
-    QuestUI::Register::RegisterModSettingsViewController(modInfo, QuestUI_DidActivate);
+    QuestUI::Register::RegisterModSettingsViewController<QonsistentSaberColors::SettingsViewController*>(modInfo, "QonsistentSaberColors");
 
     getLogger().info("Installing hooks...");
-    modManager.InstallHooks();
+    INSTALL_HOOK(getLogger(), MainMenuViewController_DidActivate);
+    INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged);
+    INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme);
+    INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCellWithIdx);
+    INSTALL_HOOK(getLogger(), SceneManager_SetActiveScene);
     getLogger().info("Installed all hooks!");
 }
