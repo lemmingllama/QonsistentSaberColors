@@ -1,11 +1,13 @@
 #include "UnityEngine/Color.hpp"
+#include "VRUIControls/VRLaserPointer.hpp"
 
 namespace QonsistentSaberColors
 {
-    void GetControllers();
+    void UpdatePointers();
 
-    void SetColors();
-    void SetColors(UnityEngine::Color leftColor, UnityEngine::Color rightColor);
+    void UpdateControllerColors();
 
-    void ResetColors();
+    void UpdateLaserColor();
+
+    void SetLaser(VRUIControls::VRLaserPointer* laser);
 }

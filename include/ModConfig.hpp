@@ -5,4 +5,5 @@
 
 DECLARE_CONFIG(ModConfig,
     CONFIG_VALUE(Enabled, bool, "Enabled", true);
+    CONFIG_VALUE(ColoredLasers, bool, "Colored lasers", true);
 )

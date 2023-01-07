@@ -1,6 +1,6 @@
 # QonsistentSaberColors
 
-description
+Menu saber colors reflect in game saber colors.
 
 ## Credits
 

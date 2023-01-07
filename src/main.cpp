@@ -10,46 +10,97 @@
 #include "UnityEngine/SceneManagement/Scene.hpp"
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
 
+#include "VRUIControls/VRPointer.hpp"
+#include "VRUIControls/VRLaserPointer.hpp"
+
+
+#include "UnityEngine/Resources.hpp"
+#include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Transform.hpp"
+#include "UnityEngine/Material.hpp"
+#include "UnityEngine/MeshRenderer.hpp"
+
 static ModInfo modInfo;
 
 using namespace QonsistentSaberColors;
 
+MAKE_HOOK_MATCH(VRPointer_CreateLaserPointerAndLaserHit, &VRUIControls::VRPointer::CreateLaserPointerAndLaserHit, void, VRUIControls::VRPointer* self)
+{
+    getLogger().info("VRPointer_CreateLaserPointerAndLaserHit");
+    VRPointer_CreateLaserPointerAndLaserHit(self);
+
+    auto mr = self->laserPointer->GetComponentInChildren<UnityEngine::MeshRenderer*>();
+    auto arr = mr->GetMaterialArray();
+    for(int i = 0; i < arr.Length(); i++)
+    {
+        auto col = arr[i]->get_color();
+        getLogger().info("Color for index %i is R:%f, G:%f, B:%f, A:%f", i, col.r, col.g, col.b, col.a);
+    }
+
+    SetLaser(self->laserPointer);
+    if(getModConfig().ColoredLasers.GetValue() && getModConfig().Enabled.GetValue())
+        UpdateLaserColor();
+}
+
 MAKE_HOOK_MATCH(MainMenuViewController_DidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController* self, bool a, bool b, bool c)
 {
+    getLogger().info("MainMenuViewController_DidActivate");
     MainMenuViewController_DidActivate(self, a, b, c);
     if(getModConfig().Enabled.GetValue())
-        SetColors();
-    else
-        ResetColors();
+    {
+        UpdateControllerColors();
+        if(getModConfig().ColoredLasers.GetValue())
+            UpdateLaserColor();
+    }
 }
 
 MAKE_HOOK_MATCH(ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged, &GlobalNamespace::ColorsOverrideSettingsPanelController::HandleOverrideColorsToggleValueChanged, void, GlobalNamespace::ColorsOverrideSettingsPanelController* self, bool isOn)
 {
+    getLogger().info("ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged");
     ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged(self, isOn);
     if(getModConfig().Enabled.GetValue())
-        SetColors();
+    {
+        UpdateControllerColors();
+        if(getModConfig().ColoredLasers.GetValue())
+            UpdateLaserColor();
+    }
 }
 
 MAKE_HOOK_MATCH(ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme, &GlobalNamespace::ColorsOverrideSettingsPanelController::HandleEditColorSchemeControllerDidChangeColorScheme, void, GlobalNamespace::ColorsOverrideSettingsPanelController* self, GlobalNamespace::ColorScheme* colorScheme)
 {
+    getLogger().info("ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme");
     ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme(self, colorScheme);
     if(getModConfig().Enabled.GetValue())
-        SetColors();
+    {
+        UpdateControllerColors();
+        if(getModConfig().ColoredLasers.GetValue())
+            UpdateLaserColor();
+    }
 }
 
 MAKE_HOOK_MATCH(ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCellWithIdx, &GlobalNamespace::ColorsOverrideSettingsPanelController::HandleDropDownDidSelectCellWithIdx, void, GlobalNamespace::ColorsOverrideSettingsPanelController* self, HMUI::DropdownWithTableView* dropDownWithTableView, int idx)
 {
+    getLogger().info("ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCellWithIdx");
     ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCellWithIdx(self, dropDownWithTableView, idx);
     if(getModConfig().Enabled.GetValue())
-        SetColors();
+    {
+        UpdateControllerColors();
+        if(getModConfig().ColoredLasers.GetValue())
+            UpdateLaserColor();
+    }
 }
 
 MAKE_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::SceneManager::SetActiveScene, bool, UnityEngine::SceneManagement::Scene scene)
 {
+    getLogger().info("SceneManager_SetActiveScene");
     bool val = SceneManager_SetActiveScene(scene);
-    GetControllers();
+    UpdatePointers();
     if(getModConfig().Enabled.GetValue() && scene.get_name() == "HealthWarning")
-        SetColors();
+    {
+        UpdateControllerColors();
+        if(getModConfig().ColoredLasers.GetValue())
+            UpdateLaserColor();
+    }
  
     return val;
 }
@@ -81,9 +132,10 @@ extern "C" void load() {
     getModConfig().Init(modInfo);
 
     QuestUI::Init();
-    QuestUI::Register::RegisterModSettingsViewController<QonsistentSaberColors::SettingsViewController*>(modInfo, "QonsistentSaberColors");
+    QuestUI::Register::RegisterAllModSettingsViewController<QonsistentSaberColors::SettingsViewController*>(modInfo, "QonsistentSaberColors");
 
     getLogger().info("Installing hooks...");
+    INSTALL_HOOK(getLogger(), VRPointer_CreateLaserPointerAndLaserHit);
     INSTALL_HOOK(getLogger(), MainMenuViewController_DidActivate);
     INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged);
     INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme);
