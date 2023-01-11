@@ -6,19 +6,11 @@
     "id": "qonsistentsabercolors",
     "version": "0.1.0",
     "url": null,
-    "additionalData": {}
+    "additionalData": {
+      "overrideSoName": "libqonsistentsabercolors.so"
+    }
   },
   "dependencies": [
-    {
-      "id": "codegen",
-      "versionRange": "^0.28.0",
-      "additionalData": {}
-    },
-    {
-      "id": "questui",
-      "versionRange": "^0.17.5",
-      "additionalData": {}
-    },
     {
       "id": "beatsaber-hook",
       "versionRange": "^3.14.0",
@@ -30,8 +22,18 @@
       "additionalData": {}
     },
     {
+      "id": "questui",
+      "versionRange": "^0.17.10",
+      "additionalData": {}
+    },
+    {
+      "id": "codegen",
+      "versionRange": "^0.32.0",
+      "additionalData": {}
+    },
+    {
       "id": "custom-types",
-      "versionRange": "^0.15.21",
+      "versionRange": "^0.15.22",
       "additionalData": {}
     }
   ],

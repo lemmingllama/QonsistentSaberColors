@@ -38,7 +38,7 @@ namespace QonsistentSaberColors
 {
     void UpdateColors()
     {
-        getLogger().info("Updating colors");
+        getLogger().info("Updating colorScheme");
         if(colorSchemesSettings->overrideDefaultColors && getModConfig().Enabled.GetValue())
         {
             auto scheme = colorSchemesSettings->GetSelectedColorScheme();
@@ -54,7 +54,7 @@ namespace QonsistentSaberColors
 
     void UpdatePointers()
     {
-        getLogger().info("Updating neccessary pointers");
+        getLogger().info("Updating pointers");
         auto controllers = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::VRController*>();
         leftController = controllers[1];
         rightController = controllers[0];
@@ -65,7 +65,6 @@ namespace QonsistentSaberColors
 
     void SetControllerColors(UnityEngine::Color leftColor, UnityEngine::Color rightColor)
     {
-        getLogger().info("SetControllerColors()");
         if(!leftController->m_CachedPtr.m_value || !leftController || !rightController->m_CachedPtr.m_value || !rightController)
         {
             getLogger().info("One of the controllers was null, updating pointers");
@@ -112,7 +111,6 @@ namespace QonsistentSaberColors
 
     void SetLaserColor(VRUIControls::VRLaserPointer* pointer)
     {
-        getLogger().info("SetLaserColor()");
         if(!laserPointer || !laserPointer->m_CachedPtr.m_value)
         {
             getLogger().info("laserPointer was null, not setting color");
@@ -138,28 +136,17 @@ namespace QonsistentSaberColors
 
     void SetLaser(VRUIControls::VRLaserPointer* laser)
     {
-        getLogger().info("SetLaser()");
         laserPointer = laser;
     }
 
     void UpdateControllerColors()
     {
-        getLogger().info("UpdateControllerColors()");
         UpdateColors();
         SetControllerColors(leftSaberColor, rightSaberColor);
     }
 
     void UpdateLaserColor()
     {
-        getLogger().info("UpdateLaserColor");
-        if(laserPointer)
-            getLogger().info("laserPointer is valid");
-        else
-        {
-            getLogger().info("laserPointer is null");
-            return;
-        }
-
         UpdateColors();
         SetLaserColor(laserPointer);
     }

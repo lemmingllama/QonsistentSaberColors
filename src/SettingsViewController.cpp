@@ -16,7 +16,6 @@ void QonsistentSaberColors::SettingsViewController::DidActivate(bool firstActiva
 
     QuestUI::BeatSaberUI::CreateToggle(transform, "Enabled", getModConfig().Enabled.GetValue(), [](bool value)
     {
-        getLogger().info("Enabled toggle");
         getModConfig().Enabled.SetValue(value);
         QonsistentSaberColors::UpdateControllerColors();
         QonsistentSaberColors::UpdateLaserColor();
@@ -24,7 +23,6 @@ void QonsistentSaberColors::SettingsViewController::DidActivate(bool firstActiva
 
     QuestUI::BeatSaberUI::CreateToggle(transform, "Colored lasers", getModConfig().ColoredLasers.GetValue(), [](bool value)
     {
-        getLogger().info("Lasers toggle");
         getModConfig().ColoredLasers.SetValue(value);
         QonsistentSaberColors::UpdateLaserColor();
     });
