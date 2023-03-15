@@ -2,8 +2,8 @@
   "configurations": [
     {
       "defines": [
-        "MOD_ID=\"qonsistentsabercolors\"",
-        "VERSION=\"0.1.0\"",
+        "MOD_ID=\"#{id}\"",
+        "VERSION=\"#{version}\"",
         "__GNUC__",
         "__aarch64__"
       ],
