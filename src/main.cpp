@@ -1,17 +1,15 @@
 #include "main.hpp"
 #include "SettingsViewController.hpp"
 #include "ModConfig.hpp"
-#include "QuestUI/shared/QuestUI.hpp"
 #include "ColorManager.hpp"
 
 #include "GlobalNamespace/MainMenuViewController.hpp"
 #include "GlobalNamespace/ColorsOverrideSettingsPanelController.hpp"
-
-#include "UnityEngine/SceneManagement/Scene.hpp"
-#include "UnityEngine/SceneManagement/SceneManager.hpp"
+#include "GlobalNamespace/MenuEnvironmentManager.hpp"
 
 #include "VRUIControls/VRPointer.hpp"
-#include "VRUIControls/VRLaserPointer.hpp"
+
+#include "QuestUI/shared/QuestUI.hpp"
 
 static ModInfo modInfo;
 
@@ -20,7 +18,6 @@ using namespace QonsistentSaberColors;
 MAKE_HOOK_MATCH(VRPointer_CreateLaserPointerAndLaserHit, &VRUIControls::VRPointer::CreateLaserPointerAndLaserHit, void, VRUIControls::VRPointer* self)
 {
     VRPointer_CreateLaserPointerAndLaserHit(self);
-    SetLaser(self->laserPointer);
     if(getModConfig().ColoredLasers.GetValue() && getModConfig().Enabled.GetValue())
         UpdateLaserColor();
 }
@@ -69,18 +66,19 @@ MAKE_HOOK_MATCH(ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCel
     }
 }
 
-MAKE_HOOK_MATCH(SceneManager_SetActiveScene, &UnityEngine::SceneManagement::SceneManager::SetActiveScene, bool, UnityEngine::SceneManagement::Scene scene)
+MAKE_HOOK_MATCH(MenuEnvironmentManager_ShowEnvironmentType, &GlobalNamespace::MenuEnvironmentManager::ShowEnvironmentType, void, GlobalNamespace::MenuEnvironmentManager* self, GlobalNamespace::MenuEnvironmentManager::MenuEnvironmentType type)
 {
-    bool val = SceneManager_SetActiveScene(scene);
+    MenuEnvironmentManager_ShowEnvironmentType(self, type);
     UpdatePointers();
-    if(getModConfig().Enabled.GetValue() && scene.get_name() == "HealthWarning")
+    if(type == GlobalNamespace::MenuEnvironmentManager::MenuEnvironmentType::None)
+        return;
+
+    if(getModConfig().Enabled.GetValue())
     {
         UpdateControllerColors();
         if(getModConfig().ColoredLasers.GetValue())
             UpdateLaserColor();
     }
- 
-    return val;
 }
 
 Configuration& getConfig() {
@@ -118,6 +116,6 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleOverrideColorsToggleValueChanged);
     INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleEditColorSchemeControllerDidChangeColorScheme);
     INSTALL_HOOK(getLogger(), ColorsOverrideSettingsPanelController_HandleDropDownDidSelectCellWithIdx);
-    INSTALL_HOOK(getLogger(), SceneManager_SetActiveScene);
+    INSTALL_HOOK(getLogger(), MenuEnvironmentManager_ShowEnvironmentType);
     getLogger().info("Installed all hooks!");
 }

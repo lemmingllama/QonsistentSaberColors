@@ -17,16 +17,12 @@
 #include "UnityEngine/Material.hpp"
 #include "UnityEngine/MeshRenderer.hpp"
 
+#include "VRUIControls/VRInputModule.hpp"
 #include "VRUIControls/VRLaserPointer.hpp"
 #include "VRUIControls/VRPointer.hpp"
+#include "UnityEngine/XR/XRNode.hpp"
 
-GlobalNamespace::VRController* leftController;
-GlobalNamespace::VRController* rightController;
-
-UnityEngine::Color leftSaberColor;
-UnityEngine::Color rightSaberColor;
-
-VRUIControls::VRLaserPointer* laserPointer;
+VRUIControls::VRInputModule* inputModule;
 
 GlobalNamespace::ColorSchemesSettings* colorSchemesSettings;
 
@@ -34,99 +30,53 @@ const UnityEngine::Color defaultLeftColor {0.784314, 0.078431, 0.078431, 1.00000
 const UnityEngine::Color defaultRightColor{0.156863, 0.556863, 0.823529, 1.000000};
 const UnityEngine::Color defaultLaserColor{0.125490f, 0.752941f, 1.000000f, 0.501961f};
 
-namespace QonsistentSaberColors
-{
-    void UpdateColors()
+namespace QonsistentSaberColors {
+    
+    UnityEngine::Color GetLeftColor()
     {
-        getLogger().info("Updating colorScheme");
-        if(colorSchemesSettings->overrideDefaultColors && getModConfig().Enabled.GetValue())
-        {
-            auto scheme = colorSchemesSettings->GetSelectedColorScheme();
-            leftSaberColor = scheme->saberAColor;
-            rightSaberColor = scheme->saberBColor;
-        }
-        else
-        {
-            leftSaberColor = defaultLeftColor;
-            rightSaberColor = defaultRightColor;
-        }
+        auto scheme = colorSchemesSettings->GetSelectedColorScheme();
+        return (colorSchemesSettings->overrideDefaultColors && getModConfig().Enabled.GetValue()) ? colorSchemesSettings->GetSelectedColorScheme()->saberAColor : defaultLeftColor;
+    }
+
+    UnityEngine::Color GetRightColor()
+    {
+        auto scheme = colorSchemesSettings->GetSelectedColorScheme();
+        return (colorSchemesSettings->overrideDefaultColors && getModConfig().Enabled.GetValue()) ? colorSchemesSettings->GetSelectedColorScheme()->saberBColor : defaultRightColor;
     }
 
     void UpdatePointers()
     {
         getLogger().info("Updating pointers");
-        auto controllers = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::VRController*>();
-        leftController = controllers[1];
-        rightController = controllers[0];
+
+        inputModule = UnityEngine::Resources::FindObjectsOfTypeAll<VRUIControls::VRInputModule*>()[0];
 
         colorSchemesSettings = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::PlayerDataModel*>()[0]->playerData->colorSchemesSettings;
     }
 
-
-    void SetControllerColors(UnityEngine::Color leftColor, UnityEngine::Color rightColor)
+    void SetControllerColor(GlobalNamespace::VRController* controller, UnityEngine::Color color)
     {
-        if(!leftController->m_CachedPtr.m_value || !leftController || !rightController->m_CachedPtr.m_value || !rightController)
+        auto glowColors = controller->GetComponentsInChildren<GlobalNamespace::SetSaberGlowColor*>();
+        for(auto glow : glowColors)
         {
-            getLogger().info("One of the controllers was null, updating pointers");
-            UpdatePointers();
-        }
-
-        auto leftGlowColors = leftController->GetComponentsInChildren<GlobalNamespace::SetSaberGlowColor*>();
-        for(auto leftGlow : leftGlowColors)
-        {
-            auto glowColor = leftGlow ->get_gameObject()->GetComponentInChildren<GlobalNamespace::SetSaberGlowColor*>();
-            glowColor->colorManager->colorScheme->saberAColor = leftColor;
-            glowColor->colorManager->colorScheme->saberBColor = rightColor;
+            auto glowColor = glow ->get_gameObject()->GetComponentInChildren<GlobalNamespace::SetSaberGlowColor*>();
+            auto scheme = glow->colorManager->colorScheme;
+            controller->node == UnityEngine::XR::XRNode::LeftHand ? scheme->saberAColor = color : scheme->saberBColor = color; 
             glowColor->SetColors();
         }
 
-        auto rightGlowColors = rightController->GetComponentsInChildren<GlobalNamespace::SetSaberGlowColor*>();
-        for(auto rightGlow : rightGlowColors)
+        auto fakeGlowColors = controller->GetComponentsInChildren<GlobalNamespace::SetSaberFakeGlowColor*>();
+        for(auto fake : fakeGlowColors)
         {
-            auto glowColor = rightGlow ->get_gameObject()->GetComponentInChildren<GlobalNamespace::SetSaberGlowColor*>();
-            glowColor->colorManager->colorScheme->saberAColor = leftColor;
-            glowColor->colorManager->colorScheme->saberBColor = rightColor;
-            glowColor->SetColors();
-        }
-
-
-        auto leftFakeGlowColors = leftController->GetComponentsInChildren<GlobalNamespace::SetSaberFakeGlowColor*>();
-        for(auto leftFake : leftFakeGlowColors)
-        {
-            auto glowColor = leftFake->get_gameObject()->GetComponentInChildren<GlobalNamespace::SetSaberFakeGlowColor*>();
-            glowColor->colorManager->colorScheme->saberAColor = leftColor;
-            glowColor->colorManager->colorScheme->saberBColor = rightColor;
-            glowColor->SetColors();
-        }
-
-        auto rightFakeGlowColors = rightController->GetComponentsInChildren<GlobalNamespace::SetSaberFakeGlowColor*>();
-        for(auto rightFake : rightFakeGlowColors)
-        {
-            auto glowColor = rightFake->get_gameObject()->GetComponentInChildren<GlobalNamespace::SetSaberFakeGlowColor*>();
-            glowColor->colorManager->colorScheme->saberAColor = leftColor;
-            glowColor->colorManager->colorScheme->saberBColor = rightColor;
+            auto glowColor = fake->get_gameObject()->GetComponentInChildren<GlobalNamespace::SetSaberFakeGlowColor*>();
+            auto scheme = glowColor->colorManager->colorScheme;
+            controller->node == UnityEngine::XR::XRNode::LeftHand ? scheme->saberAColor = color : scheme->saberBColor = color;
             glowColor->SetColors();
         }
     }
 
-    void SetLaserColor(VRUIControls::VRLaserPointer* pointer)
+    void SetLaserColor(VRUIControls::VRLaserPointer* pointer, UnityEngine::Color color)
     {
-        if(!laserPointer || !laserPointer->m_CachedPtr.m_value)
-        {
-            getLogger().info("laserPointer was null, not setting color");
-            return;
-        }
-        UnityEngine::Color color;
-        if(getModConfig().ColoredLasers.GetValue() && getModConfig().Enabled.GetValue())
-        {
-            auto parent = pointer->get_transform()->get_parent()->get_name();
-            parent == "ControllerLeft" ? color = leftSaberColor : color = rightSaberColor;
-        }
-        else
-            color = defaultLaserColor;
-        color.a = 0;
-        
-        auto renderer = laserPointer->GetComponentInChildren<UnityEngine::MeshRenderer*>();
+        auto renderer = pointer->GetComponentInChildren<UnityEngine::MeshRenderer*>();
         auto matArray = renderer->GetMaterialArray();
         for(auto mat: matArray)
         {
@@ -134,20 +84,29 @@ namespace QonsistentSaberColors
         }
     }
 
-    void SetLaser(VRUIControls::VRLaserPointer* laser)
-    {
-        laserPointer = laser;
-    }
-
     void UpdateControllerColors()
     {
-        UpdateColors();
-        SetControllerColors(leftSaberColor, rightSaberColor);
+        if(!inputModule || !inputModule->m_CachedPtr.m_value)
+            return;
+        SetControllerColor(inputModule->vrPointer->leftVRController, GetLeftColor());
+        SetControllerColor(inputModule->vrPointer->rightVRController, GetRightColor());
     }
 
     void UpdateLaserColor()
     {
-        UpdateColors();
-        SetLaserColor(laserPointer);
+        if(!inputModule || !inputModule->m_CachedPtr.m_value)
+            return;
+
+        UnityEngine::Color color;
+        if(getModConfig().ColoredLasers.GetValue() && getModConfig().Enabled.GetValue())
+        {
+            auto parent = inputModule->vrPointer->laserPointer->get_transform()->get_parent()->get_name();
+            color = parent == "ControllerLeft" ? GetLeftColor() : GetRightColor();
+        }
+        else
+            color = defaultLaserColor;
+
+        color.a = 0;
+        SetLaserColor(inputModule->vrPointer->laserPointer, color);
     }
 }
