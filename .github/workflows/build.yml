@@ -66,8 +66,6 @@ jobs:
         ls -la ${GITHUB_WORKSPACE}/extern/includes
         echo libs:
         ls -la ${GITHUB_WORKSPACE}/extern/libs
-        echo cache:
-        ls -la $HOME/.local/share/QPM/cache
         
     - name: Build
       run: |
