@@ -9,7 +9,7 @@
 
 #include "VRUIControls/VRPointer.hpp"
 
-#include "QuestUI/shared/QuestUI.hpp"
+#include "questui/shared/QuestUI.hpp"
 
 static ModInfo modInfo;
 
