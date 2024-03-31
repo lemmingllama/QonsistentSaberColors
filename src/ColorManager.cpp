@@ -71,6 +71,7 @@ namespace QonsistentSaberColors {
         auto playerDataModel = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::PlayerDataModel*>().front_or_default();
         if(!playerDataModel) {
             colorSchemesSettings = nullptr;
+            return;
         }
         colorSchemesSettings = playerDataModel->playerData->colorSchemesSettings;
     }
