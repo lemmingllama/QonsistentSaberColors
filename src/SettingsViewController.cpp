@@ -3,27 +3,31 @@
 #include "ColorManager.hpp"
 #include "ModConfig.hpp"
 
-#include "questui/shared/BeatSaberUI.hpp"
+#include "bsml/shared/BSML-Lite.hpp"
 
 DEFINE_TYPE(QonsistentSaberColors, SettingsViewController)
+
+int getf() { return 5; }
+__declspec(property(get=getf)) int f;
 
 void QonsistentSaberColors::SettingsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
     if(!firstActivation)
         return;
 
-    auto transform = QuestUI::BeatSaberUI::CreateScrollableSettingsContainer(get_transform())->get_transform();
+    auto container = BSML::Lite::CreateScrollableSettingsContainer(transform)->transform;
 
-    QuestUI::BeatSaberUI::CreateToggle(transform, "Enabled", getModConfig().Enabled.GetValue(), [](bool value)
+    BSML::Lite::CreateToggle(container, "Enabled", getModConfig().Enabled.GetValue(), [](bool value)
     {
         getModConfig().Enabled.SetValue(value);
         QonsistentSaberColors::UpdateControllerColors();
         QonsistentSaberColors::UpdateLaserColor();
     });
 
-    QuestUI::BeatSaberUI::CreateToggle(transform, "Colored lasers", getModConfig().ColoredLasers.GetValue(), [](bool value)
+    BSML::Lite::CreateToggle(container, "Colored lasers", getModConfig().ColoredLasers.GetValue(), [](bool value)
     {
         getModConfig().ColoredLasers.SetValue(value);
         QonsistentSaberColors::UpdateLaserColor();
+        StringW
     });
 }
