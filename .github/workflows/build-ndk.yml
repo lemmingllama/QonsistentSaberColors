@@ -2,27 +2,27 @@
 name: NDK build
 on:
   workflow_dispatch: null
-  push:
-    tags:
-      - v*
-    branches:
-      - master
-      - dev/*
-      - feat/*
-      - fix/*
-    paths-ignore:
-      - "**.yml"
-      - "!.github/workflows/build-ndk.yml"
-      - "**.json"
-      - "!qpm.json"
-      - "!mod.template.json"
-      - "**.txt"
-      - "!CMakeLists.txt"
-      - "**.ps1"
-      - "**.md"
-      - .gitignore
-  pull_request:
-    branches: master
+#   push:
+#     tags:
+#       - v*
+#     branches:
+#       - master
+#       - dev/*
+#       - feat/*
+#       - fix/*
+#     paths-ignore:
+#       - "**.yml"
+#       - "!.github/workflows/build-ndk.yml"
+#       - "**.json"
+#       - "!qpm.json"
+#       - "!mod.template.json"
+#       - "**.txt"
+#       - "!CMakeLists.txt"
+#       - "**.ps1"
+#       - "**.md"
+#       - .gitignore
+#   pull_request:
+#     branches: master
 env:
   module_id: qonsistentsabercolors
   qmod_name: QonsistenSaberColors
