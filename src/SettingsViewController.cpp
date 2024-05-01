@@ -7,9 +7,6 @@
 
 DEFINE_TYPE(QonsistentSaberColors, SettingsViewController)
 
-int getf() { return 5; }
-__declspec(property(get=getf)) int f;
-
 void QonsistentSaberColors::SettingsViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
 {
     if(!firstActivation)
@@ -28,6 +25,5 @@ void QonsistentSaberColors::SettingsViewController::DidActivate(bool firstActiva
     {
         getModConfig().ColoredLasers.SetValue(value);
         QonsistentSaberColors::UpdateLaserColor();
-        StringW
     });
 }

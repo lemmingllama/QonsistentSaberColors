@@ -75,10 +75,8 @@ MOD_EXPORT void setup(CModInfo* info) {
 }
 
 // Called later on in the game loading - a good time to install function hooks
-MOD_EXPORT void load() {
-    il2cpp_functions::Init();
-    #include "GlobalNamespace/BeatmapLevel.hpp"
-    
+MOD_EXPORT void late_load() {
+    il2cpp_functions::Init();    
 
     BSML::Init();
     BSML::Register::RegisterMainMenu<QonsistentSaberColors::SettingsViewController*>("QonsistentSaberColors", "QonsistentSaberColors", "QonsistentSaberColors mod settings");
