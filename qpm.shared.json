@@ -49,7 +49,9 @@
         "build",
         "extern/libs"
       ],
-      "qmodIncludeFiles": [],
+      "qmodIncludeFiles": [
+        "cover.jpg"
+      ],
       "qmodOutput": "QonsistentSaberColors"
     },
     "dependencies": [

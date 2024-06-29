@@ -37,7 +37,7 @@ namespace QonsistentSaberColors {
 
     UnityEngine::Color get_LeftColor()
     {
-        if(!colorSchemesSettings || (colorSchemesSettings->overrideDefaultColors && !getModConfig().Enabled.GetValue()))
+        if(!colorSchemesSettings || !colorSchemesSettings->overrideDefaultColors || !getModConfig().Enabled.GetValue())
             return defaultLeftColor;
 
         return colorSchemesSettings->GetSelectedColorScheme()->saberAColor;
@@ -45,7 +45,7 @@ namespace QonsistentSaberColors {
 
     UnityEngine::Color get_RightColor()
     {
-        if(!colorSchemesSettings || (colorSchemesSettings->overrideDefaultColors && !getModConfig().Enabled.GetValue()))
+        if(!colorSchemesSettings || !colorSchemesSettings->overrideDefaultColors || !getModConfig().Enabled.GetValue())
             return defaultRightColor;
 
         return colorSchemesSettings->GetSelectedColorScheme()->saberBColor;
