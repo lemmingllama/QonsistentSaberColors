@@ -17,14 +17,14 @@
       "build": [
         "pwsh ./scripts/build.ps1 --release"
       ],
-      "debug": [
-        "pwsh ./scripts/build.ps1"
-      ],
       "clean": [
         "pwsh ./scripts/build.ps1 -clean"
       ],
       "copy": [
         "pwsh ./scripts/copy.ps1"
+      ],
+      "debug": [
+        "pwsh ./scripts/build.ps1"
       ],
       "logcat": [
         "adb logcat -c",
@@ -48,7 +48,9 @@
       "build",
       "extern/libs"
     ],
-    "qmodIncludeFiles": ["cover.jpg"],
+    "qmodIncludeFiles": [
+      "cover.jpg"
+    ],
     "qmodOutput": "QonsistentSaberColors"
   },
   "dependencies": [
@@ -59,7 +61,7 @@
     },
     {
       "id": "beatsaber-hook",
-      "versionRange": "^5.1.6",
+      "versionRange": "^5.1.9",
       "additionalData": {}
     },
     {
